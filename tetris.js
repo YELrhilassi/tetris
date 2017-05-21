@@ -1,12 +1,15 @@
 const canvas = document.getElementById('Tetris');
 const context = canvas.getContext('2d');
 
+const canvs = document.getElementById('Tetris2');
+const ctx = canvs.getContext('2d');
 
 
 context.scale(20,20);
+ctx.scale(20,20);
 const pointer = {
 	pos: {x: 9, y: 0},
-	piece: creatPiece('S'),
+	piece: null,
 }
 
 
@@ -17,13 +20,13 @@ function creatPiece(type) {
 			[3, 3, 3],
 			[0, 3, 0]
 		];
-	}else if (type == 'L') {
+	}else if (type == 'J') {
 		return [
 			[0, 0, 0],
 			[9, 9, 9],
 			[0, 0, 9]
 		];
-	}else if (type == 'J') {
+	}else if (type == 'L') {
 		return [
 			[0, 0, 0],
 			[5, 5, 5],
@@ -58,7 +61,8 @@ function creatPiece(type) {
 	}
 }
 
-function shuffle(array){
+function shuffle(){
+	var array = ['I','L','J','Z','S','O','T'];
 	var currentIndex = array.length;
 	var randomIndex = 0;
 	var temValue = 0;
@@ -75,19 +79,79 @@ function shuffle(array){
 }
 
 
-var piecess = ['I','L','J','Z','S','O','T'];
-var n = 7;
 
-function piecePick(piecess){
-	var pieces = []; 
+
+var pice1 = '';
+var pice2 = '';
+var _m = 0 ;
+function picking(){
+	var temp = generate();
+	if (_m == 0 && pice1 !== '') {
+		_m++;
+		pice2 = generate();
+		while (pice2 == pice1){
+			pice2 = generate();
+		}
+		   // next(pice2);
+		  console.log(pice2);
+		return pice1;
+	}else if (_m == 1 && pice2 !== '') {
+		_m--;
+		pice1 = generate();
+		while(pice1 == pice2){
+			pice1 = generate();
+		}
+		   // next(pice1);
+		  console.log(pice1);
+		return pice2;
+	}else if (pice1 == '') {
+		pice1 = generate();
+		return temp;
+	 }
+}
+
+
+
+// const piecess = ['I','L','J','Z','S','O','T'];
+var n = 9;
+function generate(){
+	var pieces = shuffle (pieces);
+	// pieces = shuffle (pieces);
 	n--;
-	if (n == 1) {
+	if (n == 0) {
 		n = 7;
 	}
-	pieces = shuffle(piecess);
-	pieces.slice(n);
-	var x = Math.floor((Math.random() * 7) + 0 );
-	pointer.piece = creatPiece(pieces[x]);
+	var l = Math.floor((Math.random() * n)  );
+	 // var q = Math.floor((Math.random() * n)  );
+	 // var b = Math.floor((Math.random() * n)  );
+	 // var c = Math.floor((Math.random() * n)  );
+	 // var d = Math.floor((Math.random() * n)  );
+	pieces[l] = 0 ;
+	 // pieces[q] = 0 ;
+	 // pieces[b] = 0 ;
+	 // pieces[c] = 0 ;
+	 // pieces[d] = 0 ;
+	// pieces[b] = 0 ;
+
+	// console.log(pieces);
+
+	var x = Math.floor((Math.random() * 7) );
+	while (pieces[x] == 0){
+		x = Math.floor((Math.random() * 7) );
+	}
+ 	
+	return pieces[x];
+}
+
+function piecePick(){
+	// var pieces = []; 
+	// n--;
+	// if (n == 1) {
+	// 	n = 7;
+	// }
+	// pieces = shuffle(piecess);
+	// var x = Math.floor((Math.random() * 7) + 0 );
+	pointer.piece = creatPiece(picking());
 	pointer.pos.y = 0;
 	pointer.pos.x = Math.floor((Math.floor(20/2)) - (Math.floor(pointer.piece[0].length) / 2));
 }
@@ -97,27 +161,70 @@ function draw(){
 	context.fillStyle = '#000';
 	context.fillRect( 1, 0, canvas.width, canvas.height);
 	
-	
+	ctx.fillStyle = '#000';
+	ctx.fillRect( 0, 0, canvs.width, canvs.height);
+
 	drawPiece(grid, {x: 0, y: 0});
 	drawPiece(pointer.piece, pointer.pos);
- 
+	  next(pice1, pice2);
+
 }
 
 const coloring = [
 	null,
 	null,
 	null,
-	'green',
-	'red',
-	'yellow',
-	'orange',
-	'violet',
-	'pink',
-	'blue',
+	'#FF7F24',
+	'#9A32CD',
+	'#EEEE00',
+	'#00CDCD',
+	'#EE1289',
+	'#EE2C2C',
+	'#436EEE',
 
 
 ];
 
+
+function nextyox(pice){
+	if (pice[1][1] == 3) {
+		return 0.5;
+	}
+}
+
+function next(pice1, pice2){
+	 var a = creatPiece(pice1);
+	 var b = creatPiece(pice2);
+	
+	 if (_m == 0) {
+	 	for (var j = 0; j < a.length; j++) {
+			for (var i = 0; i < a[j].length; i++) {
+				if (a[j][i]) {
+				ctx.fillStyle = coloring[a[j][i]];
+				ctx.fillRect( i + nextyox(a), j+nextyox(a), 0.95, 0.95);
+				}
+			}
+		}
+
+
+
+	 }
+
+
+	else if (_m == 1 ) {
+		for (var j = 0; j < b.length; j++) {
+			for (var i = 0; i < b[j].length; i++) {
+				if (b[j][i]) {
+				ctx.fillStyle = coloring[b[j][i]];
+				ctx.fillRect( i, j, 0.95, 0.95);
+				}
+			}
+		}
+
+	}
+		
+	
+}
 
 
 function drawPiece(piece,offset){
@@ -127,10 +234,13 @@ function drawPiece(piece,offset){
 				context.fillStyle = coloring[piece[j][i]];
 				context.fillRect( i + offset.x,
 								  j + offset.y, 0.95, 0.95);
+
+				
 			}
 
 		}
 	}
+
 }
 
 
@@ -238,13 +348,6 @@ function createGid( w, h){ //creat a grid , so we can save the pieces
 		_grid[i][w-1] = 2;
 	}
 
-	// while(h--){
-	// 	var j = 0;
-	// 	_grid.push(new Array(w).fill(0));
-	// 	_grid[j][0] = 2;
-	// 	_grid[j][w] = 2;
-	// 	j++
-	// }
 	_grid.push(new Array(w).fill("-"))
 	return _grid
 }
@@ -281,20 +384,23 @@ function collide(grid, pointer){
 
 function erase (grid) {
 	var temGrid = [];
-	outer:for (var j = grid.length - 2; j > 1; j--) {
-		var mult = 1 ;
-		for (var i = 1; i < grid[j].length-1; i++) {
+	outer:for (var j = grid.length-2; j > 1; j--) {
+			for (var i = 1; i < grid[j].length-1; i++) {
+
+				if (grid[j][i] == 0) {
+					console.log(grid[j][i]);
+					continue outer;
+				}
+			}
 			
-			// mult *= grid[j][i];
-
-			if (grid[j][i] == 0) {
-
-				continue outer;
-			}	
+			console.log(grid[j][i]);
+			temGrid = grid.splice(j, 1)[0].fill(0);
+			grid.unshift(temGrid);	
+			grid[0][0] = 2 ;
+			grid[0][19] = 2;
+			mG = 0;
+					
 		}
-		temGrid = grid.splice(j, 1)[0].fill(0);
-		grid.unshift(temGrid);	
-	}
 }
 
 
@@ -302,11 +408,11 @@ function erase (grid) {
 function pieceDrop(){
 	
 	pointer.pos.y++;
+	erase (grid);		
 	if (collide(grid, pointer)){
 		pointer.pos.y--;
 		merge(grid, pointer);
-		piecePick(piecess);
-		erase (grid);		
+		piecePick();
 	}
 	dropCounter = 0 ;
 }
@@ -316,7 +422,8 @@ var dropCounter = 0 ;
 var dropInterval = 500;
 
 
-function upDate(time = 0){       // to refresh the canvas
+function upDate(time = 0){
+
 	draw();
 	const Dt = time - lasTime ;
 	lasTime = time;
@@ -324,7 +431,7 @@ function upDate(time = 0){       // to refresh the canvas
 	if (dropCounter > dropInterval) {
 		pieceDrop();
 	}
-
 	requestAnimationFrame(upDate);
 }
+piecePick();
 upDate();
